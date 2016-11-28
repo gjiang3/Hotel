@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -211,21 +212,21 @@ public class View {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean validEntry = true;
-				String errors = "Registration failed:\n";
+				String errors = "<html>";
 				
-				String user_name = usernameTextField.getText().trim();
+				String user_name = usernameTextField.getText();
 				if(user_name.isEmpty()){
 					usernameTextField.setText("");
 					validEntry = false;
-					errors += "Username cannot be empty\n";
+					errors += "Username cannot be empty<br>";
 				}else if (user_name.length() > 12) {
 					usernameTextField.setText("");
 					validEntry = false;
-					errors += "Username cannot exceed 12 characters\n";
+					errors += "Username cannot exceed 12 characters<br>";
 				}else if(model.checkUserExistence(user_name)){
 					usernameTextField.setText("");
 					validEntry = false;
-					errors += "Username already exists\n";
+					errors += "Username already exists<br>";
 				}
 
 				String pass_word = String.valueOf(passwordField.getPassword());
@@ -234,40 +235,106 @@ public class View {
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 					validEntry = false;
-					errors += "password cannot be empty\n";
+					errors += "Password cannot be empty<br>";
 				}else if(pass_word.length() > 20){
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 					validEntry = false;
-					errors += "password cannot exceed 20 characters\n";
+					errors += "Password cannot exceed 20 characters<br>";
 				}else if(!pass_word.equals(confirm_pass_word)){
 					passwordField.setText("");
 					confirmPasswordField.setText("");
 					validEntry = false;
-					errors += "passwords do not match\n";
+					errors += "Passwords do not match<br>";
 				}
 				
 				String first_name = firstNameTextField.getText();
 				if(first_name.isEmpty()){
 					firstNameTextField.setText("");
 					validEntry = false;
-					errors += "Username already exists\n";
+					errors += "First name cannont be empty<br>";
+				}else if(first_name.length() > 15){
+					firstNameTextField.setText("");
+					validEntry = false;
+					errors += "First name cannont exceed 15 characters<br>";
 				}
 				
 				String last_name = lastNameTextField.getText();
-				String gen = genderSelector.getSelectedItem().toString();
-				int user_age = Integer.parseInt(ageTextField.getText());
-				String securityQuestion = securityQuestionTextField.getText();
-				String answer = answerTextField.getText();
-				
-				try {
-					model.registerNewUser(user_name, pass_word, first_name, last_name, "Customer", user_age, gen, securityQuestion, answer);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				if(last_name.isEmpty()){
+					lastNameTextField.setText("");
+					validEntry = false;
+					errors += "Last name cannont be empty<br>";
+				}else if(last_name.length() > 15){
+					lastNameTextField.setText("");
+					validEntry = false;
+					errors += "Last name cannont exceed 15 characters<br>";
 				}
 				
+				String gen = "";
+				if(genderSelector.getSelectedItem() == null){
+					validEntry = false;
+					errors += "Gender must be selected<br>";
+				}else{
+					gen = genderSelector.getSelectedItem().toString();
+				}
+				
+				String temp_age = ageTextField.getText();
+				int user_age = 0;
+				if(!isInteger(temp_age)){
+					ageTextField.setText("");
+					validEntry = false;
+					errors += "Age must be an integer<br>";
+				}else if(temp_age.isEmpty()){
+					ageTextField.setText("");
+					validEntry = false;
+					errors += "Age cannot be empty<br>";
+				}else{
+					user_age = Integer.parseInt(temp_age);
+				}
+				
+				String securityQuestion = securityQuestionTextField.getText();
+				if(last_name.isEmpty()){
+					securityQuestionTextField.setText("");
+					validEntry = false;
+					errors += "Security question cannont be empty<br>";
+				}else if(last_name.length() > 50){
+					securityQuestionTextField.setText("");
+					validEntry = false;
+					errors += "Security question exceed 50 characters<br>";
+				}
+				
+				String answer = answerTextField.getText();
+				if(last_name.isEmpty()){
+					answerTextField.setText("");
+					validEntry = false;
+					errors += "Answer cannont be empty<br>";
+				}else if(last_name.length() > 30){
+					answerTextField.setText("");
+					validEntry = false;
+					errors += "Answer exceed 30 characters";
+				}
+				
+				if(validEntry){
+					try {
+						model.registerNewUser(user_name, pass_word, first_name, last_name, "Customer", user_age, gen, securityQuestion, answer);
+						usernameTextField.setText("");
+						passwordField.setText("");
+						confirmPasswordField.setText("");
+						firstNameTextField.setText("");
+						lastNameTextField.setText("");
+						ageTextField.setText("");
+						genderSelector.setSelectedIndex(-1);
+						securityQuestionTextField.setText("");
+						answerTextField.setText("");
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else{
+					JOptionPane.showMessageDialog(new JFrame(), errors + "</html>", "Registration failed", JOptionPane.ERROR_MESSAGE);
+				}
 			}
+				
 			
 		});
 		gbc.gridx = 0;
@@ -427,4 +494,12 @@ public class View {
 		
 		return login;
 	}
+	
+	public boolean isInteger(String s) {  
+	    for(char c : s.toCharArray()) {
+	    	if (!Character.isDigit(c)) return false;
+	    }
+	    
+	    return true;
+	}  
 }
