@@ -20,4 +20,10 @@ public class Room {
 	public String getRoomType() {
 		return roomType;
 	}
+	
+	public String toString(){
+
+		return roomType + "    $" + costPerNight + "/night";
+
+	}
 }
